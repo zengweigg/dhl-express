@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"github.com/zengweigg/dhl-express/config"
-	"net/http"
 	"time"
 )
 
@@ -13,18 +12,18 @@ const (
 	userAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/129.0.0.0 Safari/537.36"
 )
 
-type DhlExpressClient struct {
+type DhlExpClient struct {
 	config     *config.Config
 	httpClient *resty.Client
 	logger     Logger   // Logger
 	Services   services // API Services
 }
 
-func NewDHLService(cfg config.Config) *DhlExpressClient {
+func NewDHLService(cfg config.Config) *DhlExpClient {
 	loc, _ := time.LoadLocation("Asia/Shanghai")                     // 加载中国标准时间的时区信息
 	currentTime := time.Now().In(loc)                                // 获取当前时间并转换为中国时区
 	formattedTime := currentTime.Format("2006-01-02T15:04:05+08:00") // 按照指定格式输出，其中 +08:00 表示 UTC+8 时区的时间偏移
-	DhlClient := &DhlExpressClient{
+	DhlClient := &DhlExpClient{
 		config: &cfg,
 		logger: createLogger(),
 	}
@@ -61,9 +60,9 @@ func NewDHLService(cfg config.Config) *DhlExpressClient {
 			"Webstore-Platform-Version":        cfg.Version,
 		})
 	if cfg.Sandbox {
-		httpClient.SetBaseURL("https://express.api.dhl.com/mydhlapi/test/")
+		httpClient.SetBaseURL("https://express.api.dhl.com/mydhlapi/test")
 	} else {
-		httpClient.SetBaseURL("https://express.api.dhl.com/mydhlapi/")
+		httpClient.SetBaseURL("https://express.api.dhl.com/mydhlapi")
 	}
 	httpClient.
 		SetTimeout(time.Duration(cfg.Timeout) * time.Second).
@@ -74,7 +73,7 @@ func NewDHLService(cfg config.Config) *DhlExpressClient {
 			})
 			return nil
 		}).
-		SetRetryCount(2).
+		SetRetryCount(1).
 		SetRetryWaitTime(5 * time.Second).
 		SetRetryMaxWaitTime(10 * time.Second).
 		AddRetryCondition(func(r *resty.Response, err error) bool {
@@ -88,11 +87,11 @@ func NewDHLService(cfg config.Config) *DhlExpressClient {
 				return true // 如果有错误则重试
 			}
 			// 检查响应状态码是否不是200
-			if r.StatusCode() != http.StatusOK && r.StatusCode() != http.StatusCreated {
-				text += fmt.Sprintf(", error: %d", r.StatusCode())
-				DhlClient.logger.Debugf("Retry request: %s", text)
-				return true
-			}
+			// if r.StatusCode() != http.StatusOK && r.StatusCode() != http.StatusCreated {
+			// 	text += fmt.Sprintf(", error: %d", r.StatusCode())
+			// 	DhlClient.logger.Debugf("Retry request: %s", text)
+			// 	return true
+			// }
 			return false
 		})
 	DhlClient.httpClient = httpClient

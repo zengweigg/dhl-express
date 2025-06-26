@@ -30,7 +30,11 @@ type CreateShipmentData struct {
 	// PrepaidCharges             []Charge                `json:"prepaidCharges,omitempty"`
 }
 
-// 以下是所有子结构体定义
+type BankDetail struct {
+	Name                      string `json:"name,omitempty"`                      // 银行名称（仅适用于俄国）
+	SettlementLocalCurrency   string `json:"settlementLocalCurrency,omitempty"`   // 银行本币结算账号（仅适用于俄国）
+	SettlementForeignCurrency string `json:"settlementForeignCurrency,omitempty"` // 银行外币结算账号（仅适用于俄国）
+}
 
 type Pickup struct {
 	IsRequested            bool                 `json:"isRequested"`                      // 是否启用预约取件功能 "设为false：不预约取件，只制作运单 设为true：启用预约取件服务，同时制作运单和预约取件
@@ -49,55 +53,10 @@ type PartyDetails struct {
 	BankDetails         []BankDetail         `json:"bankDetails,omitempty"`         // 发件人银行信息节点（仅适用于俄国）
 }
 
-// 发件人地址信息节点
-type PostalAddress struct {
-	AddressLine1 string `json:"addressLine1"`           // 发件人地址栏1
-	AddressLine2 string `json:"addressLine2,omitempty"` // 发件人地址栏2
-	AddressLine3 string `json:"addressLine3,omitempty"` // 发件人地址栏3
-	CityName     string `json:"cityName"`               // 发件人城市名称
-	ProvinceCode string `json:"provinceCode,omitempty"` // 发件人州代码
-	ProvinceName string `json:"provinceName,omitempty"` // 发件人州名/省名
-	PostalCode   string `json:"postalCode"`             // 发件人邮编
-	CountryCode  string `json:"countryCode"`            // 发件人国家代码
-	CountyName   string `json:"countyName,omitempty"`   // 发件人所在城市的郊区名
-	CountryName  string `json:"countryName,omitempty"`  // 发件人所在城市的郊区名
-}
-
-type ContactInfo struct {
-	FullName    string `json:"fullName"`              // 发件人联系人姓名
-	CompanyName string `json:"companyName"`           // 发件人公司名称
-	Phone       string `json:"phone"`                 // 发件人电话号码
-	Email       string `json:"email,omitempty"`       // 发件人电子邮箱
-	MobilePhone string `json:"mobilePhone,omitempty"` // 发件人手机号码
-}
-
 type RegistrationNumber struct {
 	Number            string `json:"number"`            // 发件人注册号/税号
 	TypeCode          string `json:"typeCode"`          // 发件人注册号/税号类别
 	IssuerCountryCode string `json:"issuerCountryCode"` // 发件人注册号/税号所属国国家代码
-}
-
-type BankDetail struct {
-	Name                      string `json:"name,omitempty"`                      // 银行名称（仅适用于俄国）
-	SettlementLocalCurrency   string `json:"settlementLocalCurrency,omitempty"`   // 银行本币结算账号（仅适用于俄国）
-	SettlementForeignCurrency string `json:"settlementForeignCurrency,omitempty"` // 银行外币结算账号（仅适用于俄国）
-}
-
-type SpecialInstruction struct {
-	Value    string `json:"value"` // 预约取件特殊说明 预约取件的备注
-	TypeCode string `json:"typeCode"`
-}
-
-type Account struct {
-	Number   string `json:"number"`   // DHL账号
-	TypeCode string `json:"typeCode"` // DHL账号类别（账号用途）"该字段的可选值为：
-	// - shipper - 发件人
-	// - payer - 运费支付方
-	// - duties-taxes - 目的地税金支付方
-	// 如果accounts节点只添加typeCode=shipper并录入相应的number(账号），则表示使用该发件人账号支付运费；
-	// 如果如果accounts节点同时添加typeCode=shipper和typeCode=payer，并相应录入两个number(账号），则typeCode=payer所对应的number会作为支付运费的账号；
-	// 如果accounts节点添加了typeCode=duties-taxes并录入相应的number(账号）,那么该number将被用于支付目的地税金。如果该number是发件人账号或第三国账号（发件人、收件人以外的国家），需要同时在valueAddedServices节点录入特殊服务代码DD，从而启用DTP服务。
-	// 注：启用DTP会产生额外服务费用。
 }
 
 type ValueAddedService struct {
@@ -204,13 +163,6 @@ type Package struct {
 	LabelBarcodes      []Barcode        `json:"labelBarcodes,omitempty"`      // 客户条形码节点
 	LabelText          []LabelText      `json:"labelText,omitempty"`          // 转运联客户备注信息节点
 	CustomerReferences []ReferencesCode `json:"customerReferences,omitempty"` // 单件参考信息节点
-}
-
-// 快件长宽高信息节点
-type Dimensions struct {
-	Length decimal.Decimal `json:"length"` // 单件的长度
-	Width  decimal.Decimal `json:"width"`  // 单件的宽度
-	Height decimal.Decimal `json:"height"` // 单件的高度
 }
 
 type LabelText struct {
