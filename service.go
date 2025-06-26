@@ -2,8 +2,10 @@ package dhl_express
 
 import (
 	"crypto/md5"
+	"encoding/base64"
 	"encoding/hex"
 	"github.com/go-resty/resty/v2"
+	"github.com/google/uuid"
 	"github.com/zengweigg/dhl-express/config"
 )
 
@@ -29,4 +31,23 @@ func GetSign(text string) string {
 	// 将哈希值转换为十六进制字符串
 	hashStr := hex.EncodeToString(hashBytes)
 	return hashStr
+}
+
+func GenerateID() string {
+	return uuid.New().String()
+}
+
+// Base64加密字符串
+func Base64Encode(input string) string {
+	return base64.StdEncoding.EncodeToString([]byte(input))
+}
+
+func GetTestToken(username, password string) (token string) {
+	if username == "" || password == "" {
+		return ""
+	}
+	// 使用测试账号和密码用BASE64进行加密
+	bs64 := Base64Encode(username + ":" + password)
+	token = "Basic " + bs64
+	return token
 }
