@@ -1,7 +1,5 @@
 package model
 
-import "github.com/shopspring/decimal"
-
 type ShipmentResp struct {
 	ShipmentTrackingNumber string            `json:"shipmentTrackingNumber"` // 运单号
 	TrackingUrl            string            `json:"trackingUrl"`            // 跟踪链接
@@ -13,10 +11,10 @@ type ShipmentResp struct {
 }
 
 type PackageResp struct {
-	ReferenceNumber  int             `json:"referenceNumber"`            // 包裹编号
-	TrackingNumber   string          `json:"trackingNumber"`             // 跟踪号
-	TrackingUrl      string          `json:"trackingUrl"`                // 跟踪链接
-	VolumetricWeight decimal.Decimal `json:"volumetricWeight,omitempty"` // 体积重量
+	ReferenceNumber  int     `json:"referenceNumber"`            // 包裹编号
+	TrackingNumber   string  `json:"trackingNumber"`             // 跟踪号
+	TrackingUrl      string  `json:"trackingUrl"`                // 跟踪链接
+	VolumetricWeight float64 `json:"volumetricWeight,omitempty"` // 体积重量
 }
 
 type Document struct {

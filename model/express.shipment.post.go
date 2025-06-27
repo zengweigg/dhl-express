@@ -1,25 +1,20 @@
 package model
 
-import (
-	"github.com/shopspring/decimal"
-	"time"
-)
-
 // CreateShipmentData 制作运单+预约取件 格式参考文档https://developer.dhl.com/api-reference/dhl-express-mydhl-api#get-started-section/
 type CreateShipmentData struct {
-	PlannedShippingDateAndTime time.Time               `json:"plannedShippingDateAndTime"`            // 发件日期 启用预约取件服务时也会调用该字段的值作为快件备妥时间
+	PlannedShippingDateAndTime string                  `json:"plannedShippingDateAndTime"`            // 发件日期 启用预约取件服务时也会调用该字段的值作为快件备妥时间
 	ProductCode                string                  `json:"productCode"`                           // Global产品代码 "普通包裹：P，正午特派包裹：Y 更多详情，请查看开发包中Reference_Data中的 Global Product Codes页面
 	LocalProductCode           string                  `json:"localProductCode,omitempty"`            // 本地产品代码 对于CN来说，localProductCode通常与productCode一致。但对于某些国家/某些产品，两者可能存在差异，这取决于当地DHL的设定。 虽然localProductCode是选填字段，但出于数据完整传输考虑，建议在Request中保留localProductCode，一起传输。"
 	GetRateEstimates           bool                    `json:"getRateEstimates,omitempty"`            // 是否返回预估运费"---true  返回预估运费； ---false 不返回预估运费 Request中未添加该字段时，将默认为false
 	RequestOndemandDeliveryURL bool                    `json:"requestOndemandDeliveryURLM,omitempty"` // 是否返回ODD网址链 该字段的可选值为： ---true  将该字段的值设为true并结合发件人账号的配置，可以在Response中返回ODD网址---false 将该字段的值设为false，则在Response中不返回ODD网址Request中未添加该字段时，将默认为false
 	GetTransliteratedResponse  bool                    `json:"getTransliteratedResponse"`             // 是否返回多语言
 	Pickup                     *Pickup                 `json:"pickup"`                                // 预约取件节点
-	OutputImageProperties      *OutputImageProperties  `json:"outputImageProperties,omitempty"`       // 运单/发票格式、样式
-	Accounts                   []Account               `json:"accounts,omitempty"`                    // 运费以及税金支付账号
-	ValueAddedServices         []ValueAddedService     `json:"valueAddedServices,omitempty"`          // 特殊/增值服务节点
-	CustomerReferences         []Reference             `json:"customerReferences,omitempty"`          // 快件参考信息节点
 	CustomerDetails            *CustomerDetails        `json:"customerDetails"`                       // 客户信息节点
 	Content                    *Content                `json:"content"`                               // 快件详情节点
+	OutputImageProperties      *OutputImageProperties  `json:"outputImageProperties,omitempty"`       // 运单/发票格式、样式
+	Accounts                   []Account               `json:"accounts"`                              // 运费以及税金支付账号
+	ValueAddedServices         []ValueAddedService     `json:"valueAddedServices,omitempty"`          // 特殊/增值服务节点
+	CustomerReferences         []Reference             `json:"customerReferences,omitempty"`          // 快件参考信息节点
 	DocumentImages             []DocumentImage         `json:"documentImages,omitempty"`              // 无纸化单据影像上传节点
 	OnDemandDelivery           *OnDemandDelivery       `json:"onDemandDelivery,omitempty"`            // ODD服务节点
 	ShipmentNotification       []Notification          `json:"shipmentNotification,omitempty"`        // 运单生成通知节点
@@ -143,9 +138,9 @@ type CustomerDetails struct {
 }
 
 type Content struct {
-	IsCustomsDeclarable   bool               `json:"isCustomsDeclarable"`         // 所寄快件的类别：包裹/文件
+	IsCustomsDeclarable   bool               `json:"isCustomsDeclarable"`         // 所寄快件的类别：包裹T/文件F
 	Description           string             `json:"description"`                 // 货物描述
-	DeclaredValue         decimal.Decimal    `json:"declaredValue"`               // 当Request中未添加exportDeclaration字段时，该字段的值将作为包裹快件的申报价值
+	DeclaredValue         float64            `json:"declaredValue"`               // 当Request中未添加exportDeclaration字段时，该字段的值将作为包裹快件的申报价值
 	DeclaredValueCurrency string             `json:"declaredValueCurrency"`       // 货币单位
 	UnitOfMeasurement     string             `json:"unitOfMeasurement"`           // 重量单位
 	Incoterm              string             `json:"incoterm"`                    // 贸易条款
@@ -155,7 +150,7 @@ type Content struct {
 }
 
 type Package struct {
-	Weight             decimal.Decimal  `json:"weight"`                       // 快件单件的重量（即单箱重量）
+	Weight             float64          `json:"weight"`                       // 快件单件的重量（即单箱重量）
 	Description        string           `json:"description,omitempty"`        // 单件货物的内容描述
 	TypeCode           string           `json:"typeCode,omitempty"`           // 包装类型代码
 	LabelDescription   string           `json:"labelDescription,omitempty"`   // 客户的额外信息备注
@@ -194,7 +189,7 @@ type ExportDeclaration struct {
 type LineItem struct {
 	Number                          int               `json:"number"`                                    // 顺序号，用以区分每项商品
 	Description                     string            `json:"description"`                               // 单项商品的描述
-	Price                           decimal.Decimal   `json:"price"`                                     // 单价
+	Price                           float64           `json:"price"`                                     // 单价
 	Quantity                        *Quantity         `json:"quantity"`                                  // 单项商品的数量以及数量单位节点
 	CommodityCodes                  []CommodityCode   `json:"commodityCodes,omitempty"`                  // 单项商品的海关编码（HS CODE)
 	ExportReasonType                string            `json:"exportReasonType,omitempty"`                // 单项商品的出口类型
@@ -213,8 +208,8 @@ type Quantity struct {
 }
 
 type Weight struct {
-	NetValue   decimal.Decimal `json:"netValue"`   // 净重
-	GrossValue decimal.Decimal `json:"grossValue"` // 毛重
+	NetValue   float64 `json:"netValue"`   // 净重
+	GrossValue float64 `json:"grossValue"` // 毛重
 }
 
 type Invoice struct {
@@ -239,9 +234,9 @@ type DeclarationNote struct {
 }
 
 type AdditionalCharge struct {
-	Caption  string          `json:"caption,omitempty"` // 费用名称
-	Value    decimal.Decimal `json:"value"`             // 费用金额
-	TypeCode string          `json:"typeCode"`          // 费用类型
+	Caption  string  `json:"caption,omitempty"` // 费用名称
+	Value    float64 `json:"value"`             // 费用金额
+	TypeCode string  `json:"typeCode"`          // 费用类型
 }
 
 type Exporter struct {
