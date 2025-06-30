@@ -2,7 +2,7 @@ package model
 
 // CreateShipmentData 制作运单+预约取件 格式参考文档https://developer.dhl.com/api-reference/dhl-express-mydhl-api#get-started-section/
 type CreateShipmentData struct {
-	PlannedShippingDateAndTime string                  `json:"plannedShippingDateAndTime"`            // 发件日期 启用预约取件服务时也会调用该字段的值作为快件备妥时间
+	PlannedShippingDateAndTime string                  `json:"plannedShippingDateAndTime"`            // 发件日期 启用预约取件服务时也会调用该字段的值作为快件备妥时间 格式 2025-04-05T10:30:00 GMT+08:00
 	ProductCode                string                  `json:"productCode"`                           // Global产品代码 "普通包裹：P，正午特派包裹：Y 更多详情，请查看开发包中Reference_Data中的 Global Product Codes页面
 	LocalProductCode           string                  `json:"localProductCode,omitempty"`            // 本地产品代码 对于CN来说，localProductCode通常与productCode一致。但对于某些国家/某些产品，两者可能存在差异，这取决于当地DHL的设定。 虽然localProductCode是选填字段，但出于数据完整传输考虑，建议在Request中保留localProductCode，一起传输。"
 	GetRateEstimates           bool                    `json:"getRateEstimates,omitempty"`            // 是否返回预估运费"---true  返回预估运费； ---false 不返回预估运费 Request中未添加该字段时，将默认为false
