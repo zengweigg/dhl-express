@@ -13,13 +13,25 @@ type baseService service
 // 创建运单+预约取件
 func (s baseService) ShipmentCreate(postData model.CreateShipmentData) (model.ShipmentResp, error) {
 	respData := model.ShipmentResp{}
-	// 请求数据
+	//请求数据
 	resp, err := s.httpClient.R().
 		SetBody(postData).
 		Post("shipments")
 	fmt.Println(string(resp.Body()))
 	if err != nil {
 		return respData, err
+	}
+	// 检查HTTP状态码
+	if resp.StatusCode() != http.StatusCreated {
+		// 处理错误响应
+		var errorResp struct {
+			Message         string   `json:"message"`
+			AdditionalDetails []string `json:"additionalDetails"`
+		}
+		if err := sonic.Unmarshal(resp.Body(), &errorResp); err != nil {
+			return respData, fmt.Errorf("failed to parse error response: %v", err)
+		}
+		return respData, fmt.Errorf("API返回错误: %s, 详情: %v", errorResp.Message, errorResp.AdditionalDetails)
 	}
 	// 解析数据
 	err = sonic.Unmarshal(resp.Body(), &respData)

@@ -203,8 +203,8 @@ type LineItem struct {
 }
 
 type Quantity struct {
-	Value             string `json:"quantity"` // 单项商品的数量
-	UnitOfMeasurement string `json:"quantity"` // 数量单位
+	Value             int `json:"value"` // 单项商品的数量
+	UnitOfMeasurement string `json:"unitOfMeasurement"` // 数量单位
 }
 
 type Weight struct {
